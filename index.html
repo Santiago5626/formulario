@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de personas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Registro de personas</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card p-4">
+                    <form id="formpersona">
+                        <fieldset class="mb-4">
+                            <legend class="text-uppercase font-weight-bold">Datos personales</legend>
+                            <div class="mb-0">
+                                <label for="nombre" class="form-label">Nombre:</label>
+                                <input type="text" name="nombre" id="nombre" class="form-control">
+                            </div>
+                            <div class="mb-1">
+                                <label for="apellido" class="form-label">Apellido:</label>
+                                <input type="text" name="apellido" id="apellido" class="form-control">
+                            </div>
+                            <div class="mb-2">
+                                <label for="edad" class="form-label">Edad:</label>
+                                <input type="number" name="edad" id="edad" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label for="genero" class="form-label">Género:</label>
+                                <select name="genero" id="genero" class="form-select">
+                                    <option value="masculino">Masculino</option>
+                                    <option value="femenino">Femenino</option>
+                                    <option value="otros">Otros</option>
+                                </select>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="mb-2">
+                            <legend class="text-uppercase font-weight-bold">Datos de contacto</legend>
+                            <div class="mb-2">
+                                <label for="email" class="form-label">Email:</label>
+                                <input type="email" name="email" id="email" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="telefono" class="form-label">Teléfono:</label>
+                                <input type="tel" name="telefono" id="telefono" class="form-control" required>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="mb-2">
+                            <legend class="text-uppercase font-weight-bold">Archivo</legend>
+                            <div class="mb-3">
+                                <label for="archivo" class="form-label">Subir archivo:</label>
+                                <input type="file" name="archivo" id="archivo" class="form-control">
+                            </div>
+                        </fieldset>
+
+                        <div class="d-flex justify-content-center">
+                            <input type="submit" value="Guardar" class="btn btn-primary">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <h2 class="text-center mb-4">Lista de personas registradas</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Edad</th>
+                        <th>Género</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Archivo</th>
+                    </tr>
+                </thead>
+                <tbody id="personas-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const personas = JSON.parse(localStorage.getItem('personas')) || [];
+        
+        function mostrarPersonas() {
+            const tableBody = document.getElementById("personas-table-body");
+            tableBody.innerHTML = ""; 
+            personas.forEach(persona => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${persona.nombre}</td>
+                        <td>${persona.apellido}</td>
+                        <td>${persona.edad}</td>
+                        <td>${persona.genero}</td>
+                        <td>${persona.email}</td>
+                        <td>${persona.telefono}</td>
+                        <td>${persona.archivo}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        mostrarPersonas();
+
+        document.getElementById("formpersona").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const archivo = document.getElementById("archivo").files[0];
+            const archivoRuta = archivo ? archivo.name : ""; // Solo guardamos el nombre del archivo
+
+            const nuevaPersona = {
+                nombre: document.getElementById("nombre").value,
+                apellido: document.getElementById("apellido").value,
+                edad: document.getElementById("edad").value,
+                genero: document.getElementById("genero").value,
+                email: document.getElementById("email").value,
+                telefono: document.getElementById("telefono").value,
+                archivo: archivoRuta
+            }
+
+            personas.push(nuevaPersona);
+            localStorage.setItem('personas', JSON.stringify(personas));
+
+            const successMessage = document.createElement("div");
+            successMessage.className = "alert alert-success mt-3";
+            successMessage.innerText = "Datos guardados correctamente.";
+            document.body.appendChild(successMessage);
+
+            mostrarPersonas();
+
+            document.getElementById("formpersona").reset();
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
