@@ -36,6 +36,11 @@
                                     <option value="otros">Otros</option>
                                 </select>
                             </div>
+
+                            <div class="mb-2">
+                                <input type="checkbox" id="terminos" name="terminos">
+                                <label for="terminos">Acepto los términos y condiciones</label>
+                            </div>
                         </fieldset>
 
                         <fieldset class="mb-2">
@@ -48,13 +53,24 @@
                                 <label for="telefono" class="form-label">Teléfono:</label>
                                 <input type="tel" name="telefono" id="telefono" class="form-control" required>
                             </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">¿Prefieres ser contactado por?</label><br>
+                                <input type="radio" id="contactoEmail" name="contacto" value="email">
+                                <label for="contactoEmail">Correo electrónico</label><br>
+                                <input type="radio" id="contactoTelefono" name="contacto" value="telefono">
+                                <label for="contactoTelefono">Teléfono</label>
+                            </div>
                         </fieldset>
 
                         <fieldset class="mb-2">
                             <legend class="text-uppercase font-weight-bold">Archivo</legend>
                             <div class="mb-3">
                                 <label for="archivo" class="form-label">Subir archivo:</label>
-                                <input type="file" name="archivo" id="archivo" class="form-control">
+                                <input type="file" name="archivo" id="archivo" class="form-control" onchange="mostrarImagen(event)">
+                            </div>
+                            <div id="imagen-preview-container" class="mb-3">
+                                <img id="imagen-preview" src="" alt="Vista previa" style="display:none;">
                             </div>
                         </fieldset>
 
@@ -89,6 +105,17 @@
     <script>
         const personas = JSON.parse(localStorage.getItem('personas')) || [];
         
+        function mostrarImagen(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgPreview = document.getElementById('imagen-preview');
+                imgPreview.src = e.target.result;  
+                imgPreview.style.display = 'block';  
+            };
+            reader.readAsDataURL(file);
+        }
+
         function mostrarPersonas() {
             const tableBody = document.getElementById("personas-table-body");
             tableBody.innerHTML = ""; 
@@ -101,7 +128,7 @@
                         <td>${persona.genero}</td>
                         <td>${persona.email}</td>
                         <td>${persona.telefono}</td>
-                        <td>${persona.archivo}</td>
+                        <td><img src="${persona.archivo}" alt="Imagen cargada" width="100"></td>
                     </tr>
                 `;
             });
@@ -113,7 +140,10 @@
             event.preventDefault();
 
             const archivo = document.getElementById("archivo").files[0];
-            const archivoRuta = archivo ? archivo.name : ""; // Solo guardamos el nombre del archivo
+            let archivoRuta = "";
+            if (archivo) {
+                archivoRuta = URL.createObjectURL(archivo);  
+            }
 
             const nuevaPersona = {
                 nombre: document.getElementById("nombre").value,
@@ -122,7 +152,9 @@
                 genero: document.getElementById("genero").value,
                 email: document.getElementById("email").value,
                 telefono: document.getElementById("telefono").value,
-                archivo: archivoRuta
+                archivo: archivoRuta,
+                contacto: document.querySelector('input[name="contacto"]:checked') ? document.querySelector('input[name="contacto"]:checked').value : "",
+                terminos: document.getElementById("terminos").checked
             }
 
             personas.push(nuevaPersona);
@@ -136,6 +168,7 @@
             mostrarPersonas();
 
             document.getElementById("formpersona").reset();
+            document.getElementById('imagen-preview').style.display = 'none';
         });
     </script>
 
